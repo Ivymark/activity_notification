@@ -130,7 +130,7 @@ module ActivityNotification
           sent_notifications.push(notifications)
           [target, Notification.send_batch_notification_email(target, notifications, mailer_options)]
         }.to_h
-        return sent_notifications
+        return sent_notifications.flatten
       end
 
       # Returns if subscription management is allowed for this target type.
