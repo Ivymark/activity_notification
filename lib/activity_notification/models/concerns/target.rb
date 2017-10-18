@@ -125,9 +125,12 @@ module ActivityNotification
       def send_batch_unopened_notification_email(options = {})
         unopened_notification_index_map = notification_index_map(options.merge(filtered_by_status: :unopened))
         mailer_options = options.select { |k, _| [:send_later, :fallback, :batch_key].include?(k) }
+        sent_notifications = []
         unopened_notification_index_map.map { |target, notifications|
+          sent_notifications.push(notifications)
           [target, Notification.send_batch_notification_email(target, notifications, mailer_options)]
         }.to_h
+        return sent_notifications
       end
 
       # Returns if subscription management is allowed for this target type.
@@ -317,7 +320,7 @@ module ActivityNotification
     def notify_to(notifiable, options = {})
       Notification.notify_to(self, notifiable, options)
     end
-  
+
     # Opens all notifications of this target.
     # This method calls NotificationApi#open_all_of internally with self target instance.
     # @see NotificationApi#open_all_of
